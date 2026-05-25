@@ -19,6 +19,10 @@ namespace GridIt
 
         private const int TexSize = 64;
 
+        /// <summary>Max border width in pixels on the 64×64 texture.
+        /// Must match the slider max in Settings.cs.</summary>
+        public const int MaxBorderWidth = 20;
+
         static GridTex()
         {
             int thickness = GridIt_Mod.Settings?.BorderThickness ?? 3;
@@ -40,7 +44,7 @@ namespace GridIt
 
         private static Texture2D GenerateBorderTexture(int borderWidth)
         {
-            borderWidth = Mathf.Clamp(borderWidth, 1, 8);
+            borderWidth = Mathf.Clamp(borderWidth, 1, MaxBorderWidth);
 
             var tex = new Texture2D(TexSize, TexSize, TextureFormat.ARGB32, false);
             tex.filterMode = FilterMode.Bilinear;

@@ -21,6 +21,13 @@ namespace GridIt
 
         public GridOverlayMapComponent(Map map) : base(map) { }
 
+        /// <summary>Persist the toggle state across save/load.</summary>
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref ShowGrid, "ShowGrid", false);
+        }
+
         /// <summary>
         /// Force material rebuild on next frame (color/opacity changed).
         /// </summary>
@@ -38,9 +45,14 @@ namespace GridIt
             materialDirty = true;
         }
 
-        public override void MapComponentUpdate()
+        /// <summary>
+        /// MapComponentDraw runs during the render phase and only for the
+        /// currently-viewed map, so there is no cross-map drawing.
+        /// </summary>
+        public override void MapComponentDraw()
         {
             if (!ShowGrid) return;
+            if (Find.CurrentMap != map) return;
 
             if (textureDirty)
             {
@@ -56,8 +68,11 @@ namespace GridIt
 
         private static void RebuildMaterial()
         {
+            // Destroy old material to avoid leak from slider adjustments.
+            if (gridMat != null)
+                Object.Destroy(gridMat);
+
             Color color = GridIt_Mod.Settings.GetGridColor();
-            // Bypass MaterialPool to avoid stale cache hits when color changes.
             gridMat = new Material(ShaderDatabase.MetaOverlay);
             gridMat.mainTexture = GridTex.CellBorder;
             gridMat.color = color;

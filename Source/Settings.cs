@@ -12,7 +12,7 @@ namespace GridIt
         public float ColorB = 0.5f;
         public float GridOpacity = 0.30f;
 
-        // Border thickness, maps to pixel width on the 64×64 cell texture.
+        // Border thickness 1–MaxBorderWidth, pixel width on the 64×64 cell texture.
         public int BorderThickness = 3;
 
         // Hide the toggle button from the play settings row.
@@ -110,8 +110,6 @@ namespace GridIt
         // TextFieldNumeric buffers (IMGUI needs persistent string buffers).
         private string bufR, bufG, bufB, bufOpacity;
         private string hexBuffer;
-        // Track whether hex field is focused to avoid overwriting while typing.
-        private bool hexFieldFocused;
         private static readonly Regex HexValidator = new Regex(@"^[0-9A-Fa-f#]*$");
 
         public GridIt_Mod(ModContentPack content) : base(content)
@@ -197,11 +195,9 @@ namespace GridIt
             // Hex text field
             var hexFieldRect = new Rect(hashRect.xMax, hexRow.y, 60f, hexRow.height);
 
-            // Detect focus state to avoid overwriting while typing.
             string controlName = "GridIt_HexField";
             GUI.SetNextControlName(controlName);
             string newHex = Widgets.TextField(hexFieldRect, hexBuffer, 6, HexValidator);
-            hexFieldFocused = GUI.GetNameOfFocusedControl() == controlName;
 
             if (newHex != hexBuffer)
             {
@@ -223,31 +219,17 @@ namespace GridIt
             listing.GapLine();
 
             // --- Opacity: same compact row ---
-            var opacityRow = listing.GetRect(rowHeight);
-            var opacityLabelRect = new Rect(opacityRow.x, opacityRow.y, 60f, opacityRow.height);
-            Widgets.Label(opacityLabelRect, "GridIt_Settings_Opacity_Label".Translate());
-
-            var opacityInputRect = new Rect(opacityRow.xMax - inputWidth, opacityRow.y,
-                                            inputWidth, opacityRow.height);
-            var opacitySliderRect = new Rect(opacityLabelRect.xMax + gap, opacityRow.y,
-                                             opacityRow.width - opacityLabelRect.width - inputWidth - gap * 2f,
-                                             opacityRow.height);
-
-            float prevOpacity = Settings.GridOpacity;
-            Settings.GridOpacity = Widgets.HorizontalSlider(opacitySliderRect,
-                Settings.GridOpacity, 0f, 1f);
-            Widgets.TextFieldNumeric(opacityInputRect, ref Settings.GridOpacity,
-                ref bufOpacity, 0f, 1f);
-
-            if (Settings.GridOpacity != prevOpacity)
-                GridOverlayMapComponent.MarkMaterialDirty();
+            DrawSliderRow(listing, "GridIt_Settings_Opacity_Label".Translate(),
+                ref Settings.GridOpacity, ref bufOpacity,
+                0f, 1f, 60f, inputWidth, gap, rowHeight,
+                GridOverlayMapComponent.MarkMaterialDirty);
 
             listing.GapLine();
 
             // --- Border thickness ---
             listing.Label("GridIt_Settings_Thickness".Translate(
                 Settings.BorderThickness.ToString()));
-            int newThickness = (int)listing.Slider(Settings.BorderThickness, 1f, 20f);
+            int newThickness = (int)listing.Slider(Settings.BorderThickness, 1f, GridTex.MaxBorderWidth);
             if (newThickness != Settings.BorderThickness)
             {
                 Settings.BorderThickness = newThickness;
@@ -274,8 +256,10 @@ namespace GridIt
         }
 
         /// <summary>
-        /// Draw a single compact color channel row: [Label] [Slider] [NumericInput]
-        /// Returns true if the value changed.
+        /// Draw a single compact color channel row: [Label] [Slider] [NumericInput].
+        /// The slider is authoritative while dragged; the text field is authoritative
+        /// when the user types. We resolve the conflict by checking which one changed
+        /// relative to the incoming value.
         /// </summary>
         private static bool DrawColorRow(Listing_Standard listing, string label,
             ref float value, ref string buffer,
@@ -296,10 +280,66 @@ namespace GridIt
                                       row.width - labelWidth - inputWidth - gap * 2f,
                                       row.height);
 
-            value = Widgets.HorizontalSlider(sliderRect, value, 0f, 1f);
-            Widgets.TextFieldNumeric(inputRect, ref value, ref buffer, 0f, 1f);
+            // Run slider first — it returns the new value.
+            float sliderVal = Widgets.HorizontalSlider(sliderRect, value, 0f, 1f);
+
+            // Run text field — it mutates a local copy via ref.
+            float textVal = value;
+            Widgets.TextFieldNumeric(inputRect, ref textVal, ref buffer, 0f, 1f);
+
+            // Determine who changed: slider takes priority if it moved.
+            if (sliderVal != value)
+            {
+                // Slider was dragged.
+                value = sliderVal;
+                buffer = value.ToString("F2");
+            }
+            else if (textVal != value)
+            {
+                // Text field was edited.
+                value = textVal;
+            }
 
             return value != prev;
+        }
+
+        /// <summary>
+        /// Generic compact slider row: [Label] [Slider] [NumericInput].
+        /// </summary>
+        private static void DrawSliderRow(Listing_Standard listing, string label,
+            ref float value, ref string buffer,
+            float min, float max,
+            float labelWidth, float inputWidth, float gap, float rowHeight,
+            System.Action onChanged)
+        {
+            var row = listing.GetRect(rowHeight);
+            float prev = value;
+
+            var labelRect = new Rect(row.x, row.y, labelWidth, row.height);
+            Widgets.Label(labelRect, label);
+
+            var inputRect = new Rect(row.xMax - inputWidth, row.y, inputWidth, row.height);
+            var sliderRect = new Rect(labelRect.xMax + gap, row.y,
+                                      row.width - labelWidth - inputWidth - gap * 2f,
+                                      row.height);
+
+            float sliderVal = Widgets.HorizontalSlider(sliderRect, value, min, max);
+
+            float textVal = value;
+            Widgets.TextFieldNumeric(inputRect, ref textVal, ref buffer, min, max);
+
+            if (sliderVal != value)
+            {
+                value = sliderVal;
+                buffer = value.ToString("F2");
+            }
+            else if (textVal != value)
+            {
+                value = textVal;
+            }
+
+            if (value != prev)
+                onChanged?.Invoke();
         }
     }
 }
