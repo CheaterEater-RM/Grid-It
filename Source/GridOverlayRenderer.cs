@@ -45,10 +45,25 @@ namespace GridIt
         {
             if (map == null) return;
 
-            if (visible && !GridIt_Mod.Settings.HideToggleButton)
+            if (visible)
                 VisibleMapIds.Add(map.uniqueID);
             else
                 VisibleMapIds.Remove(map.uniqueID);
+        }
+
+        public static void ToggleVisible(Map map)
+        {
+            SetVisible(map, !IsVisible(map));
+        }
+
+        public static void HandleHotkey()
+        {
+            if (!WorldRendererUtility.DrawingMap) return;
+            if (Find.CurrentMap == null) return;
+            if (!GridItDefOf.GridIt_ToggleGridOverlay.KeyDownEvent) return;
+
+            ToggleVisible(Find.CurrentMap);
+            Event.current.Use();
         }
 
         public static void DrawCurrentMap()
@@ -57,12 +72,6 @@ namespace GridIt
 
             var map = Find.CurrentMap;
             if (map == null) return;
-
-            if (GridIt_Mod.Settings.HideToggleButton)
-            {
-                SetVisible(map, false);
-                return;
-            }
 
             if (!IsVisible(map)) return;
 

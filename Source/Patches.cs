@@ -49,4 +49,13 @@ namespace GridIt
             GridOverlayRenderer.DisableAllOverlays();
         }
     }
+
+    [HarmonyPatch(typeof(MapInterface), nameof(MapInterface.HandleLowPriorityInput))]
+    public static class Patch_MapInterface_GridOverlayHotkey
+    {
+        static void Postfix()
+        {
+            GridOverlayRenderer.HandleHotkey();
+        }
+    }
 }
