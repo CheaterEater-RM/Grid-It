@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- PlaySettings toggle tooltip -->
+  <GridIt_ToggleGrid>Toggle grid overlay.\n\nDraws cell borders on the map to help with spacing and alignment.</GridIt_ToggleGrid>
+
+  <!-- Mod settings -->
+  <GridIt_Settings_Presets>Quick presets:</GridIt_Settings_Presets>
+  <GridIt_Settings_Color_Gray>Gray</GridIt_Settings_Color_Gray>
+  <GridIt_Settings_Color_Black>Black</GridIt_Settings_Color_Black>
+  <GridIt_Settings_Color_White>White</GridIt_Settings_Color_White>
+  <GridIt_Settings_Opacity_Label>Opacity</GridIt_Settings_Opacity_Label>
+  <GridIt_Settings_Thickness>Border thickness: {0}</GridIt_Settings_Thickness>
+  <GridIt_Settings_HideButton>Hide toggle button</GridIt_Settings_HideButton>
+  <GridIt_Settings_HideButton_Tooltip>Hide the grid overlay toggle button from the bottom-right play settings row. The grid can still be toggled via mod settings or keybinding.</GridIt_Settings_HideButton_Tooltip>
+  <GridIt_Settings_Reset>Reset to defaults</GridIt_Settings_Reset>
+</LanguageData>

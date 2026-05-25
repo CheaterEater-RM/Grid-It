@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+1.6/Assemblies/*.dll
+1.6/Assemblies/*.pdb
