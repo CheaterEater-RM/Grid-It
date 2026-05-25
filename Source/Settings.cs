@@ -146,21 +146,21 @@ namespace GridIt
             {
                 Settings.ApplyPreset(0.5f, 0.5f, 0.5f);
                 SyncBuffers();
-                GridOverlayMapComponent.MarkMaterialDirty();
+                GridOverlayRenderer.MarkMaterialDirty();
             }
             if (Widgets.ButtonText(new Rect(presetRect.x + buttonWidth + 6f, presetRect.y, buttonWidth, 28f),
                     "GridIt_Settings_Color_Black".Translate()))
             {
                 Settings.ApplyPreset(0f, 0f, 0f);
                 SyncBuffers();
-                GridOverlayMapComponent.MarkMaterialDirty();
+                GridOverlayRenderer.MarkMaterialDirty();
             }
             if (Widgets.ButtonText(new Rect(presetRect.x + (buttonWidth + 6f) * 2f, presetRect.y, buttonWidth, 28f),
                     "GridIt_Settings_Color_White".Translate()))
             {
                 Settings.ApplyPreset(1f, 1f, 1f);
                 SyncBuffers();
-                GridOverlayMapComponent.MarkMaterialDirty();
+                GridOverlayRenderer.MarkMaterialDirty();
             }
 
             listing.Gap(8f);
@@ -182,7 +182,7 @@ namespace GridIt
             if (colorChanged)
             {
                 hexBuffer = Settings.GetHexColor();
-                GridOverlayMapComponent.MarkMaterialDirty();
+                GridOverlayRenderer.MarkMaterialDirty();
             }
 
             listing.Gap(4f);
@@ -207,7 +207,7 @@ namespace GridIt
                     bufR = Settings.ColorR.ToString("F2");
                     bufG = Settings.ColorG.ToString("F2");
                     bufB = Settings.ColorB.ToString("F2");
-                    GridOverlayMapComponent.MarkMaterialDirty();
+                    GridOverlayRenderer.MarkMaterialDirty();
                 }
             }
 
@@ -222,7 +222,7 @@ namespace GridIt
             DrawSliderRow(listing, "GridIt_Settings_Opacity_Label".Translate(),
                 ref Settings.GridOpacity, ref bufOpacity,
                 0f, 1f, 60f, inputWidth, gap, rowHeight,
-                GridOverlayMapComponent.MarkMaterialDirty);
+                GridOverlayRenderer.MarkMaterialDirty);
 
             listing.GapLine();
 
@@ -233,15 +233,18 @@ namespace GridIt
             if (newThickness != Settings.BorderThickness)
             {
                 Settings.BorderThickness = newThickness;
-                GridOverlayMapComponent.MarkTextureDirty();
+                GridOverlayRenderer.MarkTextureDirty();
             }
 
             listing.GapLine();
 
             // --- Hide toggle button ---
+            bool hideToggleBefore = Settings.HideToggleButton;
             listing.CheckboxLabeled("GridIt_Settings_HideButton".Translate(),
                 ref Settings.HideToggleButton,
                 "GridIt_Settings_HideButton_Tooltip".Translate());
+            if (Settings.HideToggleButton && !hideToggleBefore)
+                GridOverlayRenderer.DisableAllOverlays();
 
             listing.GapLine();
 
@@ -249,7 +252,7 @@ namespace GridIt
             {
                 Settings.ResetToDefaults();
                 SyncBuffers();
-                GridOverlayMapComponent.MarkTextureDirty();
+                GridOverlayRenderer.MarkTextureDirty();
             }
 
             listing.End();

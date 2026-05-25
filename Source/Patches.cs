@@ -18,10 +18,7 @@ namespace GridIt
             var map = Find.CurrentMap;
             if (map == null) return;
 
-            var comp = map.GetComponent<GridOverlayMapComponent>();
-            if (comp == null) return;
-
-            bool show = comp.ShowGrid;
+            bool show = GridOverlayRenderer.IsVisible(map);
             bool wasOn = show;
 
             row.ToggleableIcon(
@@ -31,7 +28,25 @@ namespace GridIt
                 SoundDefOf.Mouseover_ButtonToggle);
 
             if (show != wasOn)
-                comp.ShowGrid = show;
+                GridOverlayRenderer.SetVisible(map, show);
+        }
+    }
+
+    [HarmonyPatch(typeof(MapInterface), nameof(MapInterface.MapInterfaceUpdate))]
+    public static class Patch_MapInterface_DrawGridOverlay
+    {
+        static void Postfix()
+        {
+            GridOverlayRenderer.DrawCurrentMap();
+        }
+    }
+
+    [HarmonyPatch(typeof(Game), nameof(Game.FinalizeInit))]
+    public static class Patch_Game_ClearGridOverlayState
+    {
+        static void Prefix()
+        {
+            GridOverlayRenderer.DisableAllOverlays();
         }
     }
 }

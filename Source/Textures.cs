@@ -31,7 +31,7 @@ namespace GridIt
 
         /// <summary>
         /// Regenerate the border texture with a new pixel width.
-        /// Called from GridOverlayMapComponent when settings change.
+        /// Called from GridOverlayRenderer when settings change.
         /// </summary>
         public static void RegenerateBorder(int borderWidth)
         {

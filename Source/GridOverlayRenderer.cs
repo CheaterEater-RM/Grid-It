@@ -1,32 +1,23 @@
+using System.Collections.Generic;
+using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
 namespace GridIt
 {
     /// <summary>
-    /// MapComponent that draws a grid overlay using instanced mesh rendering.
-    /// Each visible cell gets a border-textured quad drawn via
-    /// Graphics.DrawMeshInstanced for minimal draw-call overhead.
+    /// Runtime-only grid overlay renderer. This intentionally does not use a
+    /// MapComponent, so Grid It does not add mod-owned objects to save files.
     /// </summary>
-    public class GridOverlayMapComponent : MapComponent
+    public static class GridOverlayRenderer
     {
-        public bool ShowGrid;
-
         private static Material gridMat;
         private static bool materialDirty = true;
         private static bool textureDirty = false;
+        private static readonly HashSet<int> VisibleMapIds = new HashSet<int>();
 
         private const int MaxBatchSize = 1023;
         private static readonly Matrix4x4[] BatchBuffer = new Matrix4x4[MaxBatchSize];
-
-        public GridOverlayMapComponent(Map map) : base(map) { }
-
-        /// <summary>Persist the toggle state across save/load.</summary>
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            Scribe_Values.Look(ref ShowGrid, "ShowGrid", false);
-        }
 
         /// <summary>
         /// Force material rebuild on next frame (color/opacity changed).
@@ -45,14 +36,35 @@ namespace GridIt
             materialDirty = true;
         }
 
-        /// <summary>
-        /// MapComponentDraw runs during the render phase and only for the
-        /// currently-viewed map, so there is no cross-map drawing.
-        /// </summary>
-        public override void MapComponentDraw()
+        public static bool IsVisible(Map map)
         {
-            if (!ShowGrid) return;
-            if (Find.CurrentMap != map) return;
+            return map != null && VisibleMapIds.Contains(map.uniqueID);
+        }
+
+        public static void SetVisible(Map map, bool visible)
+        {
+            if (map == null) return;
+
+            if (visible && !GridIt_Mod.Settings.HideToggleButton)
+                VisibleMapIds.Add(map.uniqueID);
+            else
+                VisibleMapIds.Remove(map.uniqueID);
+        }
+
+        public static void DrawCurrentMap()
+        {
+            if (!WorldRendererUtility.DrawingMap) return;
+
+            var map = Find.CurrentMap;
+            if (map == null) return;
+
+            if (GridIt_Mod.Settings.HideToggleButton)
+            {
+                SetVisible(map, false);
+                return;
+            }
+
+            if (!IsVisible(map)) return;
 
             if (textureDirty)
             {
@@ -64,6 +76,11 @@ namespace GridIt
                 RebuildMaterial();
 
             DrawGrid();
+        }
+
+        public static void DisableAllOverlays()
+        {
+            VisibleMapIds.Clear();
         }
 
         private static void RebuildMaterial()
@@ -80,8 +97,11 @@ namespace GridIt
             materialDirty = false;
         }
 
-        private void DrawGrid()
+        private static void DrawGrid()
         {
+            var map = Find.CurrentMap;
+            if (map == null) return;
+
             CellRect visible = Find.CameraDriver.CurrentViewRect;
             visible = visible.ClipInsideMap(map);
 
