@@ -7,7 +7,7 @@
     <li>1.6</li>
   </supportedVersions>
   <description>Adds a simple grid overlay to the map, toggled via an overlay button.</description>
-  <modVersion>1.1</modVersion>
+  <modVersion>1.11</modVersion>
 
   <modDependencies>
     <li>

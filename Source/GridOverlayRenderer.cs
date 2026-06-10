@@ -9,8 +9,15 @@ namespace GridIt
     /// Runtime-only grid overlay renderer. This intentionally does not use a
     /// MapComponent, so Grid It does not add mod-owned objects to save files.
     /// </summary>
+    [StaticConstructorOnStartup]
     public static class GridOverlayRenderer
     {
+        // Intentionally empty: its presence forces the [StaticConstructorOnStartup]
+        // attribute to be honored (turns off .beforefieldinit) and silences the
+        // main-thread asset-load warning. The material is still built lazily in
+        // RebuildMaterial() on the render thread.
+        static GridOverlayRenderer() { }
+
         private static Material gridMat;
         private static bool materialDirty = true;
         private static bool textureDirty = false;
