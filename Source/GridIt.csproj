@@ -17,15 +17,8 @@
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
     <LangVersion>latest</LangVersion>
     <Platforms>AnyCPU</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Configurations>Debug;Release</Configurations>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
