@@ -1,6 +1,68 @@
-bin/
-obj/
+# =========================
+# RimWorld Mod .gitignore
+# =========================
+
+# Machine-specific game paths
+RimWorld.Paths.props
+
+# Visual Studio
 .vs/
 *.user
 *.suo
+*.cache
+*.rsuser
+
+# Build artifacts
+[Oo]bj/
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+*.pdb
+
+# Debug symbols that land in the output folder
 1.6/Assemblies/*.pdb
+
+# NuGet
+*.nuget.props
+*.nuget.targets
+*.nuget.dgspec.json
+*.nuget.cache
+project.assets.json
+project.lock.json
+
+# Rider
+.idea/
+
+# .NET tool installs
+.dotnet/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Build logs
+build.log
+build_err.log
+build_restore.log
+build_restore_err.log
+*.binlog
+
+# RimWorld / Harmony debug logs
+harmony.log.txt
+Player.log
+
+# Editor workspace files
+*.code-workspace
+
+# Claude / agent scratch
+.claude/
+
+# .github / normally just copilot instructions, not used much anymore.
+.github/
+
+# Agent instruction files
+CLAUDE.md
+AGENTS.md
+
+# research and design docs
+docs/
