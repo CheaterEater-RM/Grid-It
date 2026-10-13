@@ -5,6 +5,7 @@
   <packageId>CheaterEater.GridIt</packageId>
   <supportedVersions>
     <li>1.6</li>
+    <li>1.7</li>
   </supportedVersions>
   <description>Adds a simple grid overlay to the map, toggled via an overlay button.</description>
   <modVersion>1.11</modVersion>
