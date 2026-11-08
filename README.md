@@ -24,3 +24,7 @@ The mod settings menu lets you:
 
 If the overlay button is hidden, any active grid overlay is turned off so it
 cannot be left stuck on.
+
+## Documentation
+
+Design and engineering: `design-grid-it` (`garden/design/grid-it/design-grid-it.md`) in Metis' Garden.
