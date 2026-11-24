@@ -1,3 +1,4 @@
+using System.Reflection;
 using HarmonyLib;
 using Verse;
 
@@ -9,7 +10,7 @@ namespace GridIt
         static GridIt_Init()
         {
             var harmony = new Harmony("com.cheatereater.gridit");
-            harmony.PatchAll();
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.Message("[Grid It] Harmony patches applied.");
         }
     }
